@@ -8,6 +8,9 @@ import numpy as np
 from packaging.version import Version, parse
 from setuptools import Extension, setup
 
+import nanobind
+from pathlib import Path
+
 _BUILD_ATTEMPTS = 0
 
 # This is copied from @robbuckley's fix for Panda's
@@ -113,6 +116,21 @@ def run_setup(*, with_binary, with_cuda):
                 extra_compile_args=compile_args,
             )
         )
+
+        nanobind_path = Path(nanobind.source_dir(), "nb_combined.cpp").relative_to(Path.cwd())
+        ext_modules.append(
+            Extension(
+                "shap.cutils",
+                sources=["shap/cutils/cutils.cpp", nanobind_path],
+                include_dirs=[
+                    np.get_include(),
+                    nanobind.include_dir(),
+                    os.path.join(os.path.dirname(nanobind.include_dir()), "ext", "robin_map", "include"),
+                ],
+                extra_compile_args=["-std=c++17"],
+            )
+        )
+
     if with_cuda:
         try:
             cuda_home, _ = get_cuda_path()
@@ -173,4 +191,4 @@ def try_run_setup(*, with_binary, with_cuda):
 
 # we seem to need this import guard for appveyor
 if __name__ == "__main__":
-    try_run_setup(with_binary=True, with_cuda=True)
+    try_run_setup(with_binary=True, with_cuda=False)

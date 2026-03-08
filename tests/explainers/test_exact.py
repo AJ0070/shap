@@ -6,6 +6,27 @@ import shap
 
 from . import common
 
+def test_tabular_simple_case():
+    import pytest
+    xgboost = pytest.importorskip("xgboost")
+    sk = pytest.importorskip("sklearn")
+
+    model = xgboost.XGBClassifier(tree_method="exact", base_score=0.5)
+    X, y = sk.datasets.make_classification(n_samples=100,
+                                           n_features=2,
+                                           n_informative=2,
+                                           n_redundant=0,
+                                           return_X_y=True)
+
+    X_train = X[:80]
+    X_test = X[80:]
+    y_train = y[:80]
+    y_test = y[80:]
+    model.fit(X_train, y_train)
+    ex = shap.explainers.ExactExplainer(model.predict_proba, X_train)
+    shap_values = ex(X_test)
+    y_pred = model.predict(X_test)
+
 
 def test_interactions():
     model, data = common.basic_xgboost_scenario(100)

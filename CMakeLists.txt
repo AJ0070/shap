@@ -1,0 +1,26 @@
+# Followed https://nanobind.readthedocs.io/en/latest/building.html
+cmake_minimum_required(VERSION 4.2)
+project(cutils) # Replace 'my_project' with the name of your project
+
+if (CMAKE_VERSION VERSION_LESS 4.2)
+  set(DEV_MODULE Development)
+else()
+  set(DEV_MODULE Development.Module)
+endif()
+
+# todo: how to do this for all supported python versions?
+find_package(Python 3.13 COMPONENTS Interpreter ${DEV_MODULE} REQUIRED)
+
+if (NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
+  set(CMAKE_BUILD_TYPE Release CACHE STRING "Choose the type of build." FORCE)
+  set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS "Debug" "Release" "MinSizeRel" "RelWithDebInfo")
+endif()
+
+# Detect the installed nanobind package and import it into CMake
+execute_process(
+  COMMAND "${Python_EXECUTABLE}" -m nanobind --cmake_dir
+  OUTPUT_STRIP_TRAILING_WHITESPACE OUTPUT_VARIABLE nanobind_ROOT)
+find_package(nanobind CONFIG REQUIRED)
+
+# do we need the relative path to the source file?
+nanobind_add_module(cutils shap/cutils/cutils.cpp)
