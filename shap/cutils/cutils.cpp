@@ -99,6 +99,7 @@ void compute_grey_code_row_values_2d(
 	assert(row_values.shape(0) == mask.shape(0));
 	// assert(row_values.shape(0) == mask.shape(0));
 	size_t set_size = 0;
+	size_t shapley_idx = 0;
 	int M = inds.shape(0);
 	auto rv = row_values.view();
 	int delta_ind;
@@ -106,9 +107,13 @@ void compute_grey_code_row_values_2d(
 	float off_coeff = shapley_coeff(0);
 	float multiplication_factor;
 	for (size_t i=0; i<pow(2, M); i++) {
+                assert(i < extended_delta_indexes.shape(0));
+		assert(i < outputs.shape(0));
+
 		std::cout << "Outer loop i: " << i << std::endl;
 		delta_ind = extended_delta_indexes(i);
 		if (delta_ind != noop_code) {
+			assert((delta_ind < mask.shape(0)) && (delta_ind >= 0));
 			mask(delta_ind) = !mask(delta_ind);
 			if (mask(delta_ind)) {
 				std::cout << "if (mask(delta_ind))" << std::endl;
@@ -118,13 +123,22 @@ void compute_grey_code_row_values_2d(
 				set_size -= 1;
 			}
 		}
-	        // std::cout << "Set size: " << set_size << std::endl;
-		on_coeff = shapley_coeff(set_size - 1);
+		if (set_size == 0) {
+
+			shapley_idx = shapley_coeff.shape(0) - 1;
+		}
+		else {
+			shapley_idx = set_size - 1;
+		}
+	        assert((shapley_idx < shapley_coeff.shape(0)) && (shapley_idx >= 0));
+		on_coeff = shapley_coeff(shapley_idx);
 		if (set_size < (size_t)M) {
-			off_coeff = shapley_coeff(set_size);
+			off_coeff = shapley_coeff(shapley_idx);
 		}
 		// assume inds.shape(0) == row_values.shape(0). Probably better to assert
 		for (size_t rvi = 0; rvi < rv.shape(0); rvi++) {
+			assert (rvi < inds.shape(0));
+			assert (inds(rvi) < mask.shape(0));
 			if (mask(inds(rvi))) {
 				multiplication_factor = on_coeff;
 			}
@@ -132,6 +146,10 @@ void compute_grey_code_row_values_2d(
 				multiplication_factor = -off_coeff;
 			}
 			for (size_t rvj = 0; rvj < rv.shape(1); rvj++) {
+				assert (i < outputs.shape(0));
+				assert (rvj < outputs.shape(1));
+				assert (rvi < rv.shape(0));
+				assert (rvj < rv.shape(1));
 				rv(rvi, rvj) += multiplication_factor * outputs(i, rvj);
 			}
 		}
@@ -150,6 +168,7 @@ void compute_grey_code_row_values_1d(
 	assert(row_values.shape(0) == mask.shape(0));
 	// assert(row_values.shape(0) == mask.shape(0));
 	size_t set_size = 0;
+	size_t shapley_idx = 0;
 	int M = inds.shape(0);
 	auto rv = row_values.view();
 	int delta_ind;
@@ -157,9 +176,13 @@ void compute_grey_code_row_values_1d(
 	float off_coeff = shapley_coeff(0);
 	float multiplication_factor;
 	for (size_t i=0; i<pow(2, M); i++) {
+                assert(i < extended_delta_indexes.shape(0));
+		assert(i < outputs.shape(0));
+
 		std::cout << "Outer loop i: " << i << std::endl;
 		delta_ind = extended_delta_indexes(i);
 		if (delta_ind != noop_code) {
+			assert((delta_ind < mask.shape(0)) && (delta_ind >= 0));
 			mask(delta_ind) = !mask(delta_ind);
 			if (mask(delta_ind)) {
 				std::cout << "if (mask(delta_ind))" << std::endl;
@@ -170,18 +193,30 @@ void compute_grey_code_row_values_1d(
 			}
 		}
 	        // std::cout << "Set size: " << set_size << std::endl;
-		on_coeff = shapley_coeff(set_size - 1);
+		if (set_size == 0) {
+
+			shapley_idx = shapley_coeff.shape(0) - 1;
+		}
+		else {
+			shapley_idx = set_size - 1;
+		}
+	        assert((shapley_idx < shapley_coeff.shape(0)) && (shapley_idx >= 0));
+		on_coeff = shapley_coeff(shapley_idx);
 		if (set_size < (size_t)M) {
-			off_coeff = shapley_coeff(set_size);
+			off_coeff = shapley_coeff(shapley_idx);
 		}
 		// assume inds.shape(0) == row_values.shape(0). Probably better to assert
 		for (size_t rvi = 0; rvi < rv.shape(0); rvi++) {
+			assert (rvi < inds.shape(0));
+			assert (inds(rvi) < mask.shape(0));
 			if (mask(inds(rvi))) {
 				multiplication_factor = on_coeff;
 			}
 			else {
 				multiplication_factor = -off_coeff;
 			}
+			assert (i < outputs.shape(0));
+			assert (rvi < rv.shape(0));
 		        rv(rvi) += multiplication_factor * outputs(i);
 		}
         }
