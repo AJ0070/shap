@@ -3,13 +3,12 @@ import platform
 import subprocess
 import sys
 import sysconfig
+from pathlib import Path
 
+import nanobind
 import numpy as np
 from packaging.version import Version, parse
 from setuptools import Extension, setup
-
-import nanobind
-from pathlib import Path
 
 _BUILD_ATTEMPTS = 0
 
@@ -120,7 +119,7 @@ def run_setup(*, with_binary, with_cuda):
         nanobind_path = Path(nanobind.source_dir(), "nb_combined.cpp").relative_to(Path.cwd())
         ext_modules.append(
             Extension(
-                "shap.cutils",
+                "shap.cutils.cutils",
                 sources=["shap/cutils/cutils.cpp", nanobind_path],
                 include_dirs=[
                     np.get_include(),

@@ -8,6 +8,7 @@ import numpy.typing as npt
 from numba import njit  # type: ignore[attr-defined]
 
 from .. import links
+from ..cutils.cutils import _compute_grey_code_row_values
 from ..models import Model
 from ..utils import (
     MaskedModel,
@@ -224,38 +225,38 @@ class ExactExplainer(Explainer):
         }
 
 
-@njit
-def _compute_grey_code_row_values(
-    row_values: npt.NDArray[Any],
-    mask: npt.NDArray[np.bool_],
-    inds: npt.NDArray[np.intp],
-    outputs: npt.NDArray[Any],
-    shapley_coeff: npt.NDArray[Any],
-    extended_delta_indexes: npt.NDArray[np.intp],
-    noop_code: int,
-) -> None:
-    set_size = 0
-    M = len(inds)
-    for i in range(2**M):
-        # update the mask
-        delta_ind = extended_delta_indexes[i]
-        if delta_ind != noop_code:
-            mask[delta_ind] = ~mask[delta_ind]
-            if mask[delta_ind]:
-                set_size += 1
-            else:
-                set_size -= 1
-
-        # update the output row values
-        on_coeff = shapley_coeff[set_size - 1]
-        if set_size < M:
-            off_coeff = shapley_coeff[set_size]
-        out = outputs[i]
-        for j in inds:
-            if mask[j]:
-                row_values[j] += out * on_coeff
-            else:
-                row_values[j] -= out * off_coeff
+# @njit
+# def _compute_grey_code_row_values(
+#     row_values: npt.NDArray[Any],
+#     mask: npt.NDArray[np.bool_],
+#     inds: npt.NDArray[np.intp],
+#     outputs: npt.NDArray[Any],
+#     shapley_coeff: npt.NDArray[Any],
+#     extended_delta_indexes: npt.NDArray[np.intp],
+#     noop_code: int,
+# ) -> None:
+#     set_size = 0
+#     M = len(inds)
+#     for i in range(2**M):
+#         # update the mask
+#         delta_ind = extended_delta_indexes[i]
+#         if delta_ind != noop_code:
+#             mask[delta_ind] = ~mask[delta_ind]
+#             if mask[delta_ind]:
+#                 set_size += 1
+#             else:
+#                 set_size -= 1
+#
+#         # update the output row values
+#         on_coeff = shapley_coeff[set_size - 1]
+#         if set_size < M:
+#             off_coeff = shapley_coeff[set_size]
+#         out = outputs[i]
+#         for j in inds:
+#             if mask[j]:
+#                 row_values[j] += out * on_coeff
+#             else:
+#                 row_values[j] -= out * off_coeff
 
 
 @njit
