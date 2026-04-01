@@ -4,6 +4,7 @@
 #include <nanobind/ndarray.h>
 #include <cmath>
 #include <iostream>
+#include <tuple>
 
 namespace nb = nanobind;
 using namespace nb::literals;
@@ -110,13 +111,13 @@ void compute_grey_code_row_values_2d(
                 assert(i < extended_delta_indexes.shape(0));
 		assert(i < outputs.shape(0));
 
-		std::cout << "Outer loop i: " << i << std::endl;
+		// std::cout << "Outer loop i: " << i << std::endl;
 		delta_ind = extended_delta_indexes(i);
 		if (delta_ind != noop_code) {
 			assert((delta_ind < mask.shape(0)) && (delta_ind >= 0));
 			mask(delta_ind) = !mask(delta_ind);
 			if (mask(delta_ind)) {
-				std::cout << "if (mask(delta_ind))" << std::endl;
+				// std::cout << "if (mask(delta_ind))" << std::endl;
 				set_size += 1;
 			}
 			else {
@@ -179,13 +180,13 @@ void compute_grey_code_row_values_1d(
                 assert(i < extended_delta_indexes.shape(0));
 		assert(i < outputs.shape(0));
 
-		std::cout << "Outer loop i: " << i << std::endl;
+		// std::cout << "Outer loop i: " << i << std::endl;
 		delta_ind = extended_delta_indexes(i);
 		if (delta_ind != noop_code) {
 			assert((delta_ind < mask.shape(0)) && (delta_ind >= 0));
 			mask(delta_ind) = !mask(delta_ind);
 			if (mask(delta_ind)) {
-				std::cout << "if (mask(delta_ind))" << std::endl;
+				// std::cout << "if (mask(delta_ind))" << std::endl;
 				set_size += 1;
 			}
 			else {
@@ -221,6 +222,52 @@ void compute_grey_code_row_values_1d(
 		}
         }
 }
+
+// @cython.boundscheck(False)
+// @cython.wraparound(False)
+// def _exp_val(int nsamples_run,
+//              int nsamples_added,
+//              int D,
+//              int N,
+//              double[::1] weights,
+//              double[:,:] y,
+//              double[:,:] ey):
+//
+//     cdef:
+//         double[::1] ref = np.zeros(D)
+//         double[::1] eyVal = np.zeros(D)
+//         int i, j, k
+//
+//     for i in range(nsamples_added):
+//         if i < nsamples_run:
+//             continue
+//         eyVal[:] = ref
+//         for j in range(N):
+//             for k in range(D):
+//                 eyVal[k] += y[i * N + j, k] * weights[j]
+//
+//         ey[i, :] = eyVal
+//         nsamples_run += 1
+//     return ey, nsamples_run
+//
+
+// std::tuple<nb::ndarray<double, nb::ndim<1>, nb::c_contig>, nb::ndarray<double, nb::ndim<1>, nb::c_contig>> _exp_val(
+//     const int nsamples_run,
+//     const int nsamples_added,
+//     const int D,
+//     const nb::ndarray<double, nb::ndim<1>, nb::c_contig>,
+//     const nb::ndarray<double, nb::ndim<2>>,
+//     const nb::ndarray<double, nb::ndim<2>>,
+// ) {
+//     std::vector<double> ref(D, 0.0);
+//     std::vector<double eyVal(D, 0.0);
+//     for (size_t i = 0; i < nsamples_added; i++) {
+// 	    if (i < nsamples_run) {
+// 		    continue;
+// 	    }
+// 	    std::memcpy(eyVal, std::vector<double> tmp(D, ref), sizeof array);
+//     }
+// }
 
 NB_MODULE(cutils, m) {
     m.def("_compute_grey_code_row_values", &compute_grey_code_row_values_1d);

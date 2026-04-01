@@ -8,17 +8,15 @@ import shap
 
 from . import common
 
+
 def test_tabular_simple_case():
     import pytest
+
     xgboost = pytest.importorskip("xgboost")
     sk = pytest.importorskip("sklearn")
 
     model = xgboost.XGBClassifier(tree_method="exact", base_score=0.5)
-    X, y = sk.datasets.make_classification(n_samples=100,
-                                           n_features=2,
-                                           n_informative=2,
-                                           n_redundant=0,
-                                           return_X_y=True)
+    X, y = sk.datasets.make_classification(n_samples=100, n_features=2, n_informative=2, n_redundant=0, return_X_y=True)
 
     X_train = X[:80]
     X_test = X[80:]
@@ -39,6 +37,19 @@ def test_interactions():
 @compare_numpy_outputs_against_baseline(func_file=__file__)
 def test_tabular_single_output_auto_masker():
     model, data = common.basic_xgboost_scenario(100)
+    return common.test_additivity(shap.explainers.ExactExplainer, model.predict, data, data)
+
+
+@compare_numpy_outputs_against_baseline(func_file=__file__)
+def test_tabular_single_output_auto_masker_single_value():
+    # This currently fails with an MemoryError, I assume due to having a different dimension than required!
+    model, data = common.basic_xgboost_scenario(1)
+    return common.test_additivity(shap.explainers.ExactExplainer, model.predict, data, data)
+
+
+@compare_numpy_outputs_against_baseline(func_file=__file__)
+def test_tabular_single_output_auto_masker_minimal():
+    model, data = common.basic_xgboost_scenario(2)
     return common.test_additivity(shap.explainers.ExactExplainer, model.predict, data, data)
 
 
