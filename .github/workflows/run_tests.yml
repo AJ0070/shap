@@ -105,6 +105,10 @@ jobs:
       - name: Install libomp (macOS)
         if: matrix.os == 'macos-latest'
         run: brew install libomp
+      - name: Build cutils (nanobind)
+        run: |
+          python -m pip install nanobind
+          make build_cutils
       - name: Install dependencies
         # Do regular install NOT editable install: see GH #3020
         run: |
