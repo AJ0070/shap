@@ -206,20 +206,20 @@ void compute_grey_code_row_values_1d(
 		if (set_size < (size_t)M) {
 			// maybe this can lead to errors!
 			// assert(shapley_idx + 1 < shapley_coeff.shape(0));
-			std::cout << "shapley_idx + 1: " << shapley_idx + 1 << " shapley_coeff.shape(0): " << shapley_coeff.shape(0) << std::endl;
+			// std::cout << "shapley_idx + 1: " << shapley_idx + 1 << " shapley_coeff.shape(0): " << shapley_coeff.shape(0) << std::endl;
 			off_coeff = shapley_coeff((shapley_idx + 1) % shapley_coeff.shape(0));
 		}
 		// assume inds.shape(0) == row_values.shape(0). Probably better to assert
 		for (size_t ii = 0; ii < inds.shape(0); ii++) {
-			std::cout << "rvi: " << ii << " inds.shape(0): " << inds.shape(0) << std::endl;
+			// std::cout << "rvi: " << ii << " inds.shape(0): " << inds.shape(0) << std::endl;
 			assert (inds(ii) < mask.shape(0));
 			if (mask(inds(ii))) {
 				multiplication_factor = on_coeff;
-				std::cout << " i: " << i << " mask[j]: " << mask(inds(ii)) <<  " out: " << outputs(i) << " on_coeff: " << multiplication_factor << " set_size: " << set_size << " shapley_coeff: " << shapley_coeff(shapley_idx) << std::endl;
+				// std::cout << " i: " << i << " mask[j]: " << mask(inds(ii)) <<  " out: " << outputs(i) << " on_coeff: " << multiplication_factor << " set_size: " << set_size << " shapley_coeff: " << shapley_coeff(shapley_idx) << std::endl;
 			}
 			else {
 				multiplication_factor = -off_coeff;
-				std::cout << " i: " << i << " mask[j]: " << mask(inds(ii)) << " out: " << outputs(i) << " off_coeff: " << multiplication_factor << " set_size: " << set_size << " shapley_coeff: " << shapley_coeff((shapley_idx + 1) % shapley_coeff.shape(0)) <<  std::endl;
+				// std::cout << " i: " << i << " mask[j]: " << mask(inds(ii)) << " out: " << outputs(i) << " off_coeff: " << multiplication_factor << " set_size: " << set_size << " shapley_coeff: " << shapley_coeff((shapley_idx + 1) % shapley_coeff.shape(0)) <<  std::endl;
 			}
 			assert (i < outputs.shape(0));
 			// assert (rvi < rv.shape(0));
