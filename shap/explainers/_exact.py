@@ -164,8 +164,29 @@ class ExactExplainer(Explainer):
                 coeff = shapley_coefficients(len(inds))
                 row_values = np.zeros((len(fm),) + outputs.shape[1:])
                 mask = np.zeros(len(fm), dtype=bool)
+
+                np.savez(
+                    "before_compute_grey_code_row_value_cpp.npz",
+                    row_values=row_values,
+                    mask=mask,
+                    inds=inds,
+                    outputs=outputs,
+                    coeff=coeff,
+                    extended_delta_indexes=extended_delta_indexes,
+                    noop_code=MaskedModel.delta_mask_noop_value,
+                )
                 _compute_grey_code_row_values(
                     row_values, mask, inds, outputs, coeff, extended_delta_indexes, MaskedModel.delta_mask_noop_value
+                )
+                np.savez(
+                    "after_compute_grey_code_row_value_cpp.npz",
+                    row_values=row_values,
+                    mask=mask,
+                    inds=inds,
+                    outputs=outputs,
+                    coeff=coeff,
+                    extended_delta_indexes=extended_delta_indexes,
+                    noop_code=MaskedModel.delta_mask_noop_value,
                 )
 
             # Shapley-Taylor interaction values

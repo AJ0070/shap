@@ -121,6 +121,31 @@ def test_serialization_no_model_or_masker():
 
 
 @compare_numpy_outputs_against_baseline(func_file=__file__)
+def test_serialization_no_model_or_masker_reduced():
+    import pytest
+
+    X, y = shap.datasets.adult()
+    breakpoint()
+    X = X.iloc[:, :3]
+    xgboost = pytest.importorskip("xgboost")
+    data = X
+
+    model = xgboost.XGBClassifier(tree_method="exact", base_score=0.5, seed=42)
+    model.fit(X, y)
+
+    return common.test_serialization(
+        shap.explainers.ExactExplainer,
+        model.predict,
+        data,
+        data,
+        model_saver=False,
+        masker_saver=False,
+        model_loader=lambda _: model.predict,
+        masker_loader=lambda _: data,
+    )
+
+
+@compare_numpy_outputs_against_baseline(func_file=__file__)
 def test_serialization_custom_model_save():
     model, data = common.basic_xgboost_scenario()
     return common.test_serialization(

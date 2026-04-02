@@ -97,6 +97,7 @@ void compute_grey_code_row_values_2d(
     const nb::ndarray<uint64_t, nb::shape<-1>, nb::device::cpu>& extended_delta_indexes,
     const int noop_code
 ) {
+        std::cout << "compute_grey_code_row_values_2d" << std::endl;
 	assert(row_values.shape(0) == mask.shape(0));
 	// assert(row_values.shape(0) == mask.shape(0));
 	size_t set_size = 0;
@@ -104,9 +105,9 @@ void compute_grey_code_row_values_2d(
 	int M = inds.shape(0);
 	auto rv = row_values.view();
 	int delta_ind;
-	float on_coeff;
-	float off_coeff = shapley_coeff(0);
-	float multiplication_factor;
+	double on_coeff;
+	double off_coeff = shapley_coeff(0);
+	double multiplication_factor;
 	for (size_t i=0; i<pow(2, M); i++) {
                 assert(i < extended_delta_indexes.shape(0));
 		assert(i < outputs.shape(0));
@@ -125,7 +126,6 @@ void compute_grey_code_row_values_2d(
 			}
 		}
 		if (set_size == 0) {
-
 			shapley_idx = shapley_coeff.shape(0) - 1;
 		}
 		else {
@@ -134,7 +134,7 @@ void compute_grey_code_row_values_2d(
 	        assert((shapley_idx < shapley_coeff.shape(0)) && (shapley_idx >= 0));
 		on_coeff = shapley_coeff(shapley_idx);
 		if (set_size < (size_t)M) {
-			off_coeff = shapley_coeff(shapley_idx);
+			off_coeff = shapley_coeff((shapley_idx + 1) % shapley_coeff.shape(0));
 		}
 		// assume inds.shape(0) == row_values.shape(0). Probably better to assert
 		for (size_t rvi = 0; rvi < rv.shape(0); rvi++) {
@@ -166,6 +166,7 @@ void compute_grey_code_row_values_1d(
     const nb::ndarray<uint64_t, nb::shape<-1>, nb::device::cpu>& extended_delta_indexes,
     const int noop_code
 ) {
+        std::cout << "compute_grey_code_row_values_1d" << std::endl;
 	assert(row_values.shape(0) == mask.shape(0));
 	// assert(row_values.shape(0) == mask.shape(0));
 	size_t set_size = 0;
@@ -173,9 +174,9 @@ void compute_grey_code_row_values_1d(
 	int M = inds.shape(0);
 	auto rv = row_values.view();
 	int delta_ind;
-	float on_coeff;
-	float off_coeff = shapley_coeff(0);
-	float multiplication_factor;
+	double on_coeff;
+	double off_coeff = shapley_coeff(0);
+	double multiplication_factor;
 	for (size_t i=0; i<pow(2, M); i++) {
                 assert(i < extended_delta_indexes.shape(0));
 		assert(i < outputs.shape(0));
@@ -195,7 +196,6 @@ void compute_grey_code_row_values_1d(
 		}
 	        // std::cout << "Set size: " << set_size << std::endl;
 		if (set_size == 0) {
-
 			shapley_idx = shapley_coeff.shape(0) - 1;
 		}
 		else {
@@ -204,22 +204,33 @@ void compute_grey_code_row_values_1d(
 	        assert((shapley_idx < shapley_coeff.shape(0)) && (shapley_idx >= 0));
 		on_coeff = shapley_coeff(shapley_idx);
 		if (set_size < (size_t)M) {
-			off_coeff = shapley_coeff(shapley_idx);
+			// maybe this can lead to errors!
+			// assert(shapley_idx + 1 < shapley_coeff.shape(0));
+			std::cout << "shapley_idx + 1: " << shapley_idx + 1 << " shapley_coeff.shape(0): " << shapley_coeff.shape(0) << std::endl;
+			off_coeff = shapley_coeff((shapley_idx + 1) % shapley_coeff.shape(0));
 		}
 		// assume inds.shape(0) == row_values.shape(0). Probably better to assert
-		for (size_t rvi = 0; rvi < rv.shape(0); rvi++) {
-			assert (rvi < inds.shape(0));
-			assert (inds(rvi) < mask.shape(0));
-			if (mask(inds(rvi))) {
+		for (size_t ii = 0; ii < inds.shape(0); ii++) {
+			std::cout << "rvi: " << ii << " inds.shape(0): " << inds.shape(0) << std::endl;
+			assert (inds(ii) < mask.shape(0));
+			if (mask(inds(ii))) {
 				multiplication_factor = on_coeff;
+				std::cout << " i: " << i << " mask[j]: " << mask(inds(ii)) <<  " out: " << outputs(i) << " on_coeff: " << multiplication_factor << " set_size: " << set_size << " shapley_coeff: " << shapley_coeff(shapley_idx) << std::endl;
 			}
 			else {
 				multiplication_factor = -off_coeff;
+				std::cout << " i: " << i << " mask[j]: " << mask(inds(ii)) << " out: " << outputs(i) << " off_coeff: " << multiplication_factor << " set_size: " << set_size << " shapley_coeff: " << shapley_coeff((shapley_idx + 1) % shapley_coeff.shape(0)) <<  std::endl;
 			}
 			assert (i < outputs.shape(0));
-			assert (rvi < rv.shape(0));
-		        rv(rvi) += multiplication_factor * outputs(i);
+			// assert (rvi < rv.shape(0));
+		        rv(inds(ii)) += multiplication_factor * outputs(i);
 		}
+            // if mask[j]:
+            //     print(f"i: {i}, mask[j]: {mask[j]}, out: {out}, on_coeff: {on_coeff}")
+            //     row_values[j] += out * on_coeff
+            // else:
+            //     print(f"i: {i}, mask[j]: {mask[j]}, out: {out}, off_coeff: {off_coeff}")
+            //     row_values[j] -= out * off_coeff
         }
 }
 
