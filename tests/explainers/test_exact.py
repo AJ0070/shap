@@ -85,7 +85,6 @@ def test_tabular_single_output_independent_masker():
 @compare_numpy_outputs_against_baseline(func_file=__file__)
 def test_tabular_multi_output_independent_masker():
     model, data = common.basic_xgboost_scenario(100)
-    breakpoint()
     return common.test_additivity(
         shap.explainers.ExactExplainer, model.predict_proba, shap.maskers.Independent(data), data
     )

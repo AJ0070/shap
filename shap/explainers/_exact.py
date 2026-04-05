@@ -176,31 +176,8 @@ class ExactExplainer(Explainer):
                 row_values = np.zeros((len(fm),) + outputs.shape[1:])
                 mask = np.zeros(len(fm), dtype=bool)
 
-                np.savez(
-                    "before_compute_grey_code_row_value_cpp.npz",
-                    row_values=row_values,
-                    mask=mask,
-                    inds=inds,
-                    outputs=outputs,
-                    coeff=coeff,
-                    extended_delta_indexes=extended_delta_indexes,
-                    noop_code=MaskedModel.delta_mask_noop_value,
-                )
-                # _compute_grey_code_row_values(
-                #     row_values, mask, inds, outputs, coeff, extended_delta_indexes, MaskedModel.delta_mask_noop_value
-                # )
                 _compute_grey_code_row_values(
                     row_values, mask, inds, outputs, coeff, extended_delta_indexes, MaskedModel.delta_mask_noop_value
-                )
-                np.savez(
-                    "after_compute_grey_code_row_value_cpp.npz",
-                    row_values=row_values,
-                    mask=mask,
-                    inds=inds,
-                    outputs=outputs,
-                    coeff=coeff,
-                    extended_delta_indexes=extended_delta_indexes,
-                    noop_code=MaskedModel.delta_mask_noop_value,
                 )
 
             # Shapley-Taylor interaction values
@@ -258,40 +235,6 @@ class ExactExplainer(Explainer):
             "main_effects": main_effect_values if main_effects else None,
             "clustering": getattr(self.masker, "clustering", None),
         }
-
-
-# @njit
-def _compute_grey_code_row_values_njit(
-    row_values: npt.NDArray[Any],
-    mask: npt.NDArray[np.bool_],
-    inds: npt.NDArray[np.intp],
-    outputs: npt.NDArray[Any],
-    shapley_coeff: npt.NDArray[Any],
-    extended_delta_indexes: npt.NDArray[np.intp],
-    noop_code: int,
-) -> None:
-    set_size = 0
-    M = len(inds)
-    for i in range(2**M):
-        # update the mask
-        delta_ind = extended_delta_indexes[i]
-        if delta_ind != noop_code:
-            mask[delta_ind] = ~mask[delta_ind]
-            if mask[delta_ind]:
-                set_size += 1
-            else:
-                set_size -= 1
-
-        # update the output row values
-        on_coeff = shapley_coeff[set_size - 1]
-        if set_size < M:
-            off_coeff = shapley_coeff[set_size]
-        out = outputs[i]
-        for j in inds:
-            if mask[j]:
-                row_values[j] += out * on_coeff
-            else:
-                row_values[j] -= out * off_coeff
 
 
 @njit
