@@ -37,6 +37,10 @@ jobs:
         run: |
           python -m pip install --upgrade uv
           uv pip install --system '.[download_datasets]'
+      - name: Install cutils
+        run: |
+          uv pip install nanobind
+          make build_cutils
       - name: Pre-download datasets
         run: python tests/datasets_to_cache.py
       - name: Create unified cache directory
@@ -107,7 +111,7 @@ jobs:
         run: brew install libomp
       - name: Build cutils (nanobind)
         run: |
-          python -m pip install nanobind
+          uv pip install nanobind
           make build_cutils
       - name: Install dependencies
         # Do regular install NOT editable install: see GH #3020
@@ -181,6 +185,10 @@ jobs:
         run: |
           python -m pip install --upgrade uv
           uv pip install --system numpy==2.0 '.[test-core,plots]'
+      - name: Install cutils
+        run: |
+          uv pip install nanobind
+          make build_cutils
       - name: Test with pytest
         run: pytest --durations=20 --import-mode=append
 
@@ -199,5 +207,9 @@ jobs:
           python -m pip install --upgrade uv
           uv pip install --system '.[test-core]'
           uv pip install --system --reinstall -r requirements.ci.txt
+      - name: Install cutils
+        run: |
+          uv pip install nanobind
+          make build_cutils
       - name: Run mypy
         run: mypy shap tests
