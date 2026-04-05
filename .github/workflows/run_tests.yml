@@ -37,8 +37,6 @@ jobs:
         run: |
           python -m pip install --upgrade uv
           uv pip install --system '.[download_datasets]'
-      - name: Install cutils
-        run: |
           uv pip install nanobind
           make build_cutils
       - name: Pre-download datasets
@@ -62,7 +60,7 @@ jobs:
       matrix:
         os: ["ubuntu-latest"]
         # The total number of matrix jobs should match codecov.yml `after_n_builds`.
-        python-version: ["3.12", "3.13", "3.14"]
+        python-version: ["3.11", "3.12", "3.13", "3.14"]
         extras: ["test"]
         include:
           # Test on windows/mac, just one job each
@@ -109,15 +107,13 @@ jobs:
       - name: Install libomp (macOS)
         if: matrix.os == 'macos-latest'
         run: brew install libomp
-      - name: Build cutils (nanobind)
-        run: |
-          uv pip install nanobind
-          make build_cutils
       - name: Install dependencies
         # Do regular install NOT editable install: see GH #3020
         run: |
           python -m pip install --upgrade uv
           uv pip install --system '.[${{ matrix.extras }},plots]'
+          uv pip install nanobind
+          make build_cutils
       - name: Download pre-cached datasets
         uses: actions/download-artifact@v4
         with:
@@ -185,8 +181,6 @@ jobs:
         run: |
           python -m pip install --upgrade uv
           uv pip install --system numpy==2.0 '.[test-core,plots]'
-      - name: Install cutils
-        run: |
           uv pip install nanobind
           make build_cutils
       - name: Test with pytest
