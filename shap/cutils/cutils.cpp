@@ -178,6 +178,7 @@ void compute_grey_code_row_values_1d(
 	double off_coeff = shapley_coeff(0);
 	double multiplication_factor;
 	for (size_t i=0; i<pow(2, M); i++) {
+		std::cout << "Outer loop i: " << i << std::endl;
                 assert(i < extended_delta_indexes.shape(0));
 		assert(i < outputs.shape(0));
 
@@ -201,6 +202,7 @@ void compute_grey_code_row_values_1d(
 		else {
 			shapley_idx = set_size - 1;
 		}
+		std::cout << "shapley_idx: " << shapley_idx << " set_size: " << set_size << std::endl;
 	        assert((shapley_idx < shapley_coeff.shape(0)) && (shapley_idx >= 0));
 		on_coeff = shapley_coeff(shapley_idx);
 		if (set_size < (size_t)M) {

@@ -87,7 +87,6 @@ def compare_numpy_outputs_against_baseline(*, func_file, baseline_dir=None, rtol
     def decorator(func):
         @functools.wraps(func)
         def wrapper(*args, **kwargs):
-            # breakpoint()
             output = func(*args, **kwargs)
             base_func_name = f"{Path(func_file).stem}_{func.__name__}"
             baseline_file = baseline_dir / f"{base_func_name}_baseline.npz"
