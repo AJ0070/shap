@@ -1,5 +1,5 @@
 # Followed https://nanobind.readthedocs.io/en/latest/building.html
-cmake_minimum_required(VERSION 4.2)
+cmake_minimum_required(VERSION 3.26)
 project(cutils) # Replace 'my_project' with the name of your project
 
 if (CMAKE_VERSION VERSION_LESS 4.2)
