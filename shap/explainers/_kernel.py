@@ -18,7 +18,6 @@ from sklearn.pipeline import make_pipeline
 from sklearn.preprocessing import StandardScaler
 from tqdm.auto import tqdm
 
-# from _kernel_lib import _exp_val
 from shap.cutils.cutils import _compute_exp_val as _exp_val
 
 from .._explanation import Explanation
