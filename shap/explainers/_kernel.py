@@ -11,13 +11,15 @@ import numpy.typing as npt
 import pandas as pd
 import scipy.sparse
 import sklearn
-from _kernel_lib import _exp_val
 from packaging import version
 from scipy.special import binom
 from sklearn.linear_model import Lasso, LassoLarsIC, lars_path
 from sklearn.pipeline import make_pipeline
 from sklearn.preprocessing import StandardScaler
 from tqdm.auto import tqdm
+
+# from _kernel_lib import _exp_val
+from shap.cutils.cutils import _compute_exp_val as _exp_val
 
 from .._explanation import Explanation
 from ..utils import safe_isinstance
@@ -683,7 +685,7 @@ class KernelExplainer(Explainer):
         self.y[self.nsamplesRun * self.N : self.nsamplesAdded * self.N, :] = np.reshape(modelOut, (num_to_run, self.D))
 
         # find the expected value of each output
-        self.ey, self.nsamplesRun = _exp_val(
+        self.nsamplesRun = _exp_val(
             self.nsamplesRun, self.nsamplesAdded, self.D, self.N, self.data.weights, self.y, self.ey
         )
 
