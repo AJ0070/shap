@@ -8,6 +8,7 @@ import re
 import string
 import warnings
 from collections.abc import Sequence
+from typing import TYPE_CHECKING
 
 import numpy as np
 import pandas as pd
@@ -26,6 +27,9 @@ from ..utils._exceptions import DimensionError
 from ..utils._legacy import Data, DenseData, Instance, Link, Model, convert_to_link
 from ._labels import labels
 
+if TYPE_CHECKING:
+    from matplotlib.axes import Axes
+
 
 def force(
     base_value,
@@ -42,7 +46,7 @@ def force(
     ordering_keys_time_format=None,
     text_rotation=0,
     contribution_threshold=0.05,
-    ax: "matplotlib.axes.Axes | None" = None,
+    ax: "Axes | None" = None,
 ):
     """Visualize the given SHAP values with an additive force layout.
 
@@ -406,7 +410,7 @@ def visualize(
     ordering_keys_time_format=None,
     text_rotation=0,
     min_perc=0.05,
-    ax: "matplotlib.axes.Axes | None" = None,
+    ax: "Axes | None" = None,
 ):
     """Main interface for switching between matplotlib / javascript force plots.
 
@@ -538,7 +542,7 @@ class AdditiveForceVisualizer(BaseVisualizer):
         show,
         text_rotation,
         min_perc=0.05,
-        ax: "matplotlib.axes.Axes | None" = None,
+        ax: "Axes | None" = None,
     ):
         return draw_additive_plot(
             self.data,
