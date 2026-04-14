@@ -37,7 +37,9 @@ class _MaskerWithUnsupportedClustering:
 
 
 def test_random_init_wraps_non_model_and_applies_call_args_defaults():
-    model_fn = lambda x: x
+    def model_fn(x):
+        return x
+
     masker = _MaskerWithArrayClustering()
     explainer = Random(model_fn, masker, constant=True, max_evals=123)
 
