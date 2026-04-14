@@ -24,6 +24,7 @@ class _DummyIndependentMasker:
 
 class _DummyNonIndependentMasker:
     """Mock non-Independent masker for testing."""
+
     shape = (2, 3)
 
 
@@ -76,6 +77,7 @@ def test_additive_ebm_without_masker_not_implemented(monkeypatch):
 
     class MockEBM:
         """Mock ExplainableBoostingClassifier."""
+
         def decision_function(self, X):
             return np.sum(X, axis=1)
 
@@ -124,6 +126,7 @@ def test_additive_supports_model_ebm_no_interactions(monkeypatch):
 
     class MockEBM:
         """Mock ExplainableBoostingClassifier."""
+
         interactions = 0
 
     ebm_model = MockEBM()
@@ -145,6 +148,7 @@ def test_additive_supports_model_ebm_with_interactions_raises(monkeypatch):
 
     class MockEBM:
         """Mock ExplainableBoostingClassifier."""
+
         interactions = 2
 
     ebm_model = MockEBM()
