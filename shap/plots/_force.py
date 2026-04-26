@@ -100,17 +100,13 @@ def force(
         will be displayed.
 
     ax : matplotlib Axes
-        Axes object to draw the plot onto, otherwise uses the current Axes.
+        Axes object to draw the plot onto. If not provided, a new Figure and Axes are created.
         Only applicable when ``matplotlib`` is set to True.
 
     Returns
     -------
     If ``matplotlib`` is ``False``, returns a Javascript visualizer object.
-    If ``matplotlib`` is ``True`` and ``show=False``, returns the :external+mpl:class:`~matplotlib.axes.Axes`.
-
-    Examples
-    --------
-    See `force plot examples <https://shap.readthedocs.io/en/latest/example_notebooks/api_examples/plots/force.html>`_.
+    If ``matplotlib`` is ``True`` and ``show=False``, returns the :external+mpl:class:`~matplotlib.figure.Figure`.
 
     """
     # support passing an explanation object

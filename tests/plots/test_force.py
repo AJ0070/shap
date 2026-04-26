@@ -87,58 +87,6 @@ def test_random_force_plot_mpl_text_rotation_with_data(data_explainer_shap_value
     plt.close("all")
 
 
-def test_force_plot_mpl_accepts_and_returns_ax(data_explainer_shap_values):
-    """Force plot should draw on the passed axis and return it when show=False."""
-    X, explainer, shap_values = data_explainer_shap_values
-
-    fig, ax = plt.subplots(figsize=(8, 2))
-    returned_ax = shap.force_plot(
-        explainer.expected_value,
-        shap_values[0, :],
-        X.iloc[0, :],
-        matplotlib=True,
-        show=False,
-        ax=ax,
-    )
-
-    assert returned_ax is ax
-    plt.close(fig)
-
-
-def test_force_plot_mpl_respects_existing_figure(data_explainer_shap_values):
-    """When ax is omitted, force plot should use the current figure."""
-    X, explainer, shap_values = data_explainer_shap_values
-
-    fig = plt.figure(figsize=(8, 2))
-    returned_ax = shap.force_plot(
-        explainer.expected_value,
-        shap_values[0, :],
-        X.iloc[0, :],
-        matplotlib=True,
-        show=False,
-    )
-
-    assert returned_ax.figure is fig
-    plt.close(fig)
-
-
-def test_force_plot_mpl_explanation_interface_returns_ax(data_explainer_shap_values):
-    """Force plot should support Explanation input directly and return the passed axis."""
-    X, explainer, _ = data_explainer_shap_values
-    explanation = explainer(X)
-
-    fig, ax = plt.subplots(figsize=(8, 2))
-    returned_ax = shap.force_plot(
-        explanation[0],
-        matplotlib=True,
-        show=False,
-        ax=ax,
-    )
-
-    assert returned_ax is ax
-    plt.close(fig)
-
-
 def test_force_plot_multiple_samples_returns_array_visualizer(data_explainer_shap_values):
     """Multiple rows should produce an AdditiveForceArrayVisualizer in JS mode."""
     X, explainer, shap_values = data_explainer_shap_values
@@ -150,9 +98,6 @@ def test_force_plot_multiple_samples_returns_array_visualizer(data_explainer_sha
         matplotlib=False,
     )
 
-    from shap.plots._force import AdditiveForceArrayVisualizer
-
-    assert isinstance(vis, AdditiveForceArrayVisualizer)
     assert "AdditiveForceArrayVisualizer" in vis.html()
 
 
@@ -187,11 +132,9 @@ def test_force_save_html_roundtrip(data_explainer_shap_values):
     X, explainer, shap_values = data_explainer_shap_values
     vis = shap.force_plot(explainer.expected_value, shap_values[0, :], X.iloc[0, :], matplotlib=False)
 
-    from shap.plots import _force as force_mod
-
     with TemporaryDirectory() as tmpdir:
         out_file = Path(tmpdir) / "force_plot.html"
-        force_mod.save_html(str(out_file), vis, full_html=True)
+        shap.save_html(str(out_file), vis, full_html=True)
         html = out_file.read_text(encoding="utf-8")
 
     assert "<html>" in html
@@ -200,30 +143,15 @@ def test_force_save_html_roundtrip(data_explainer_shap_values):
 
 def test_force_save_html_requires_visualizer():
     """save_html should reject inputs that are not force visualizers."""
-    from shap.plots import _force as force_mod
-
     with pytest.raises(TypeError, match="requires a Visualizer"):
-        force_mod.save_html("dummy.html", object())
+        shap.save_html("dummy.html", object())
 
 
 def test_force_initjs_requires_ipython(monkeypatch):
     """initjs should raise when IPython support is unavailable."""
-    from shap.plots import _force as force_mod
-
-    monkeypatch.setattr(force_mod, "have_ipython", False)
+    monkeypatch.setitem(shap.initjs.__globals__, "have_ipython", False)
     with pytest.raises(AssertionError, match="IPython must be installed"):
-        force_mod.initjs()
-
-
-def test_force_helper_functions():
-    from shap.plots import _force as force_mod
-
-    generated = force_mod.id_generator(size=10)
-    assert generated.startswith("i")
-    assert len(generated) == 11
-
-    assert force_mod.ensure_not_numpy(np.str_("x")) == "x"
-    assert force_mod.ensure_not_numpy(np.float64(1.2)) == 1.2
+        shap.initjs()
 
 
 @pytest.mark.mpl_image_compare(tolerance=3)

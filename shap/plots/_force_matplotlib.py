@@ -344,11 +344,8 @@ def draw_additive_plot(data, figsize, show, text_rotation=0, min_perc=0.05, ax: 
     out_value = data["outValue"]
     offset_text = (np.abs(total_neg) + np.abs(total_pos)) * 0.04
 
-    # Keep legacy figure lifecycle when ax is not supplied by using the current figure.
     if ax is None:
-        fig = plt.gcf()
-        fig.set_size_inches(figsize)
-        ax = fig.gca()
+        _, ax = plt.subplots(figsize=figsize)
 
     # Compute axis limit
     update_axis_limits(ax, total_pos, pos_features, total_neg, neg_features, base_value, out_value)
@@ -416,4 +413,4 @@ def draw_additive_plot(data, figsize, show, text_rotation=0, min_perc=0.05, ax: 
     if show:
         plt.show()
     else:
-        return ax
+        return ax.figure
